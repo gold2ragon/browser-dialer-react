@@ -7,6 +7,7 @@ button:focus, button:active, button:hover, label:focus, .btn:active,
 
 .dropdown-menu li a {
   padding: 3px 10px;
+  min-width: 166px !important;
 }
 
 .btn-circle {
@@ -19,12 +20,12 @@ button:focus, button:active, button:hover, label:focus, .btn:active,
   border-radius: 30px;
 }
 
-.controls, .keys {
+.keys {
   padding-top: 10px;
 }
 
 .controls {
-  float: left;
+  /* float: left; */
 }
 
 .controls .btn {
@@ -33,8 +34,8 @@ button:focus, button:active, button:hover, label:focus, .btn:active,
 }
 
 .keys {
-  padding-left: 20px;
-  float: right;
+  /* padding-left: 20px; */
+  /* float: right; */
   text-align: center;
   color: #fff;
 }
@@ -44,9 +45,14 @@ button:focus, button:active, button:hover, label:focus, .btn:active,
 }
 
 .key-row .btn {
+  font-size: 20px;
   font-weight: 100;
+  color: black;
+  width: 33%;
 }
-
+.key-row .btn:active {
+  border: 1px solid lightgrey;
+}
 .key-row .btn span {
   display: block;
   padding-top: 2px;
@@ -76,4 +82,57 @@ p {
   padding: 0;
   width: 240px;
   text-align: center;
+}
+.dial-button {
+  padding: 9px 10px 5px 9px;
+  background: #228F67;
+  border-radius: 5px;
+}
+.dial-button > svg {
+  color: white;
+}
+.phone-icon-div {
+  text-align: right;
+}
+#dial-form > .input-group-sm {
+  width: 100%;
+}
+.btn-call {
+  width: 100%;
+}
+.mainpad {
+  padding: 10px;
+  background: #FFFFFF;
+  box-shadow: 0 10px 30px 0 rgba(0, 0, 0, 0.15);
+  border: 1px solid #E9EBED;  
+}
+.subPad {
+  height: 390px;
+}
+.phonenumber-list {
+  display: flex;
+  margin-top: 12px;
+}
+.phonenumber-list .dropdown {
+  width: 100%;
+  text-align: left;
+}
+.phonenumber-list button {
+  width: 100%;
+  text-align: left;
+}
+.svg-phone {
+  margin: 11px 10px 0px !important;
+}
+.dropdown-toggle:focus {
+  border: 1px solid lightgrey;
+}
+.btn .caret {
+  float: right;
+  margin-top: 9px;
+}
+
+.fa-th {
+  margin: 8px 0 0 8px;
+  font-size: 20px;
 }

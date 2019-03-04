@@ -266,6 +266,12 @@ var DialerApp = React.createClass({
     Twilio.Device.ready(function() {
       self.log = 'Connected';
     });
+    
+    Twilio.Device.incoming(function(conn) {
+      console.log('Incoming connection from ' + conn.parameters.From);
+      // accept the incoming connection and start two-way audio
+      // conn.accept();
+    });
   },
 
   // Handle country code selection

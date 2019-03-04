@@ -27,6 +27,11 @@ app.get('/token', (request, response) => {
     new ClientCapability.OutgoingClientScope({
       applicationSid: process.env.TWILIO_TWIML_APP_SID})
   );
+  capability.addScope(
+    new ClientCapability.IncomingClientScope('joey')
+  );
+  // capability.allowClientOutgoing({applicationSid: process.env.TWILIO_TWIML_APP_SID});
+  // capability.allowClientIncoming('joey');
 
   const token = capability.toJwt();
 
@@ -38,6 +43,7 @@ app.get('/token', (request, response) => {
 
 // Create TwiML for outbound calls
 app.post('/voice', (request, response) => {
+  console.log(request);
   let voiceResponse = new VoiceResponse();
   voiceResponse.dial({
     callerId: process.env.TWILIO_NUMBER,

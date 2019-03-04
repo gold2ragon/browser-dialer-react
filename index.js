@@ -44,6 +44,9 @@ app.post('/voice', (request, response) => {
   }, request.body.number);
   response.type('text/xml');
   response.send(voiceResponse.toString());
+  // voiceResponse.say('Hello from your pals at Twilio. Have fun!');
+  // response.type('text/xml');
+  // response.send(voiceResponse.toString());
 });
 
 app.post('/sms', (req, res) => {

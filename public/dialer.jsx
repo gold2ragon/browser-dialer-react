@@ -235,6 +235,7 @@ var DialerApp = React.createClass({
         { name: 'Spain', cc: '34', code: 'es' },
         { name: 'Brazil', cc: '55', code: 'br' },
         { name: 'Russia', cc: '7', code: 'ru' },
+        { name: 'China', cc: '86', code: 'cn' },
       ],
       selectedPhone: phones[0],
       status: 'Online',

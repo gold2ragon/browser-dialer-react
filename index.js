@@ -3,14 +3,18 @@
 require('dotenv-safe').load();
 const http = require('http');
 const express = require('express');
-const {urlencoded} = require('body-parser');
+const bodyParser = require('body-parser');
 const twilio = require('twilio');
 const ClientCapability = twilio.jwt.ClientCapability;
 const VoiceResponse = twilio.twiml.VoiceResponse;
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
 
 let app = express();
+
 app.use(express.static(__dirname + '/public'));
-app.use(urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json());
 
 // Generate a Twilio Client capability token
 app.get('/token', (request, response) => {
@@ -40,6 +44,24 @@ app.post('/voice', (request, response) => {
   }, request.body.number);
   response.type('text/xml');
   response.send(voiceResponse.toString());
+});
+
+app.post('/sms', (req, res) => {
+  // require the Twilio module and create a REST client
+  const client = require('twilio')(accountSid, authToken);
+  res.header('Content-Type', 'application/json');
+  console.log(req.body);
+  client.messages.create(
+    {
+      from: process.env.TWILIO_NUMBER,
+      to: req.body.to, 
+      body: req.body.body
+    },
+    (err, message) => {
+      console.log(message);
+    }
+  );
+  return res.send({result: JSON.stringify(req.body)});
 });
 
 let server = http.createServer(app);

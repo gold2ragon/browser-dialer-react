@@ -26,6 +26,7 @@ button:focus, button:active, button:hover, label:focus, .btn:active,
 
 .controls {
   /* float: left; */
+  display: flex;
 }
 
 .controls .btn {
@@ -41,7 +42,7 @@ button:focus, button:active, button:hover, label:focus, .btn:active,
 }
 
 .key-row {
-  margin-bottom: 20px;
+  /* margin-bottom: 20px; */
 }
 
 .key-row .btn {
@@ -107,7 +108,8 @@ p {
   border: 1px solid #E9EBED;  
 }
 .subPad {
-  height: 390px;
+  height: 276px;
+  /* padding-top: 10px; */
 }
 .phonenumber-list {
   display: flex;
@@ -135,4 +137,42 @@ p {
 .fa-th {
   margin: 8px 0 0 8px;
   font-size: 20px;
+}
+.btn-status button {
+  border: none;
+  display: flex;
+  margin: 0 auto;
+}
+.btn-status .available {
+  margin: 6px;
+}
+.available {
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
+}
+.Online {
+  color: green;
+}
+.Online .available {
+  background: green;
+}
+.Busy {
+  color: grey;
+}
+.Busy .available {
+  background: grey;
+}
+.btn-mic {
+  zoom: 0.7;
+  margin-left: 10px;
+  width: 60px;
+}
+textarea {
+  margin-top: 10px;
+  height: 224px !important;
+}
+.btn-send {
+  width: 100%;
+  margin-top: 8px;
 }

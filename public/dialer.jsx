@@ -1,7 +1,23 @@
 const phones = [
-  'YOUR_TWILIO_NUMBER_1',
-  'YOUR_TWILIO_NUMBER_2',
+  '14154840653',
+  '17178627937', 
+   
 ]
+const countries = [
+  { name: 'United States', cc: '1', code: 'us' },
+  { name: 'Great Britain', cc: '44', code: 'gb' },
+  { name: 'Colombia', cc: '57', code: 'co' },
+  { name: 'Ecuador', cc: '593', code: 'ec' },
+  { name: 'Estonia', cc: '372', code: 'ee' },
+  { name: 'Germany', cc: '49', code: 'de' },
+  { name: 'Hong Kong', cc: '852', code: 'hk' },
+  { name: 'Ireland', cc: '353', code: 'ie' },
+  { name: 'Singapore', cc: '65', code: 'sg' },
+  { name: 'Spain', cc: '34', code: 'es' },
+  { name: 'Brazil', cc: '55', code: 'br' },
+  { name: 'Russia', cc: '7', code: 'ru' },
+  { name: 'China', cc: '86', code: 'cn' },
+];
 var StatusToggle = React.createClass({
   render: function() {
     self = this;
@@ -15,21 +31,13 @@ var StatusToggle = React.createClass({
     );
   }
 });
-var SelectPhoneList = React.createClass({
-  getInitialState() {
-    return {
-      selectedPhone: phones[0]
-    }
-  },
-  handleOnChangePhoneOption(phone) {
-    this.setState({selectedPhone: phone})
-  },
+var SelectPhoneList = React.createClass({  
   render: function() {
     self = this;
     var phoneLists = phones.map(function(phone) {
       return (
         <li>
-          <a href="#" onClick={() => self.handleOnChangePhoneOption(phone)}>
+          <a href="#" onClick={() => self.props.handleOnChangePhoneOption(phone)}>
             <span> {phone} </span>
           </a>
         </li>
@@ -51,7 +59,7 @@ var SelectPhoneList = React.createClass({
           </svg>
         </span>
         <div className="dropdown">
-          <button className="btn dropdown-toggle" type="button" data-toggle="dropdown">{this.state.selectedPhone}
+          <button className="btn dropdown-toggle" type="button" data-toggle="dropdown">{this.props.selectedPhone}
           <span className="caret"></span></button>
           <ul className="dropdown-menu">
             {phoneLists}
@@ -211,18 +219,11 @@ var MessageBox = React.createClass({
   }
 });
 var IncomingInfo = React.createClass({
-  getInitialState() {
-    return {
-      seconds: 0
-    }
-  },
   render: function() {
     return (
       <div className="subpad text-center incoming-box">
         <p className="incoming">Incoming call</p>
-        <p className="seconds">{this.state.seconds}</p>
         <p className="caller"><b>Caller: {this.props.phone_number}</b></p>
-        <p className="location">{this.props.location}</p>
         <div>
           <button className="btn btn-decline" onClick={this.props.onDecline}>Decline</button>
           <button className="btn btn-accept" onClick={this.props.onAccept}>Accept</button>
@@ -243,20 +244,7 @@ var DialerApp = React.createClass({
       countryCode: '1',
       currentNumber: '',
       isValidNumber: false,
-      countries: [
-        { name: 'United States', cc: '1', code: 'us' },
-        { name: 'Great Britain', cc: '44', code: 'gb' },
-        { name: 'Colombia', cc: '57', code: 'co' },
-        { name: 'Ecuador', cc: '593', code: 'ec' },
-        { name: 'Estonia', cc: '372', code: 'ee' },
-        { name: 'Germany', cc: '49', code: 'de' },
-        { name: 'Hong Kong', cc: '852', code: 'hk' },
-        { name: 'Ireland', cc: '353', code: 'ie' },
-        { name: 'Singapore', cc: '65', code: 'sg' },
-        { name: 'Spain', cc: '34', code: 'es' },
-        { name: 'Brazil', cc: '55', code: 'br' },
-        { name: 'Russia', cc: '7', code: 'ru' },
-      ],
+      countries: countries,
       selectedPhone: phones[0],
       status: 'Online',
       message: '',
@@ -276,6 +264,13 @@ var DialerApp = React.createClass({
       console.log(err);
       self.setState({log: 'Could not fetch token, see console.log'});
     });
+    Twilio.Device.connect(function() {
+      self.setState({
+        muted: false,
+        onPhone: true,
+        calling: false
+      })
+    });
 
     // Configure event handlers for Twilio Device
     Twilio.Device.disconnect(function() {
@@ -293,11 +288,9 @@ var DialerApp = React.createClass({
       console.log(conn);
       console.log('Incoming connection from ' + conn.parameters.From);
       console.log(self.state.status);
-      if (self.state.status == 'Busy') {
-        conn.status('closed');
-        console.log('busy');
+      if (self.state.status == 'Online') {
+        self.setState({ calling: true, togglePad: true, connection: conn })
       }
-      self.setState({ calling: true, togglePad: true, connection: conn })
     });
   },
 
@@ -325,14 +318,10 @@ var DialerApp = React.createClass({
   // or hang up the current call
   handleToggleCall() {
     if (!this.state.onPhone) {
-      this.setState({
-        muted: false,
-        onPhone: true
-      })
       // make outbound call with current number
       var n = '+' + this.state.countryCode + this.state.currentNumber.replace(/\D/g, '');
       Twilio.Device.connect({ number: n });
-      this.setState({log: 'Calling ' + n})
+      self.setState({currentNumber: n});
     } else {
       // hang up call in progress
       Twilio.Device.disconnectAll();
@@ -373,6 +362,7 @@ var DialerApp = React.createClass({
     fetch('/sms',{
       method: 'POST',
       body: JSON.stringify({
+        from: from,
         to: to,
         body: msg
       }),
@@ -389,12 +379,30 @@ var DialerApp = React.createClass({
       console.log(error);
     })
   },
+  handleOnChangePhoneOption(phone) {
+    this.setState({selectedPhone: phone})
+  },
   onAccept() {
     this.state.connection.accept();
+    let phone_number = this.state.connection.From;
+    console.log(phone_number);
+    phone_number = phone_number.substring(1, phone_number.length-1)
+    countries.map((country) => {
+      if (phone_number.indexOf(country.cc == 0)) {
+        phone_number = phone_number.substring(country.cc.length, phone_number.length - country.cc.length);
+        self.setState({countryCode: countryCode});
+        return true;
+      }
+    })
+    this.setState({
+      onPhone: true, 
+      calling: false,
+      currentNumber: phone_number
+    });
   },
   onDecline() {
     this.state.connection.reject();
-    this.setState({calling: false});
+    this.setState({onPhone: false, calling: false});
   },
   render: function() {
     var self = this;
@@ -414,7 +422,7 @@ var DialerApp = React.createClass({
         { this.state.togglePad 
           ? <div className="mainpad">
             <StatusToggle status={this.state.status} toggleStatus={this.toggleStatus} />
-            <SelectPhoneList handleToggleKeypad={ this.handleToggleKeypad }/>
+            <SelectPhoneList handleToggleKeypad={ this.handleToggleKeypad } selectedPhone={this.state.selectedPhone} handleOnChangePhoneOption={this.handleOnChangePhoneOption}/>
             <div id="dial-form" className="input-group input-group-sm">
               <CountrySelectBox countries={this.state.countries} countryCode={this.state.countryCode}
                   handleOnChange={this.handleChangeCountryCode}/>
@@ -422,7 +430,7 @@ var DialerApp = React.createClass({
             </div>
             {
               this.state.calling 
-                ? <IncomingInfo phone_number={this.state.connection.parameters.From} location="USA" onAccept={this.onAccept} onDecline={this.onDecline}/> 
+                ? <IncomingInfo phone_number={this.state.connection.parameters.From} onAccept={this.onAccept} onDecline={this.onDecline}/> 
                 : this.state.toggleKeypad ?
                   <div className="subPad">
                     <DTMFTone handleOnClick={this.updatePhoneNumber}/>

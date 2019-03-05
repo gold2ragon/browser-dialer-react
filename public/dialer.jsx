@@ -1,6 +1,6 @@
 const phones = [
-  '14154840653',
-  '17178627937',
+  'YOUR_TWILIO_NUMBER_1',
+  'YOUR_TWILIO_NUMBER_2',
 ]
 var StatusToggle = React.createClass({
   render: function() {
@@ -210,6 +210,27 @@ var MessageBox = React.createClass({
     );
   }
 });
+var IncomingInfo = React.createClass({
+  getInitialState() {
+    return {
+      seconds: 0
+    }
+  },
+  render: function() {
+    return (
+      <div className="subpad text-center incoming-box">
+        <p className="incoming">Incoming call</p>
+        <p className="seconds">{this.state.seconds}</p>
+        <p className="caller"><b>Caller: {this.props.phone_number}</b></p>
+        <p className="location">{this.props.location}</p>
+        <div>
+          <button className="btn btn-decline" onClick={this.props.onDecline}>Decline</button>
+          <button className="btn btn-accept" onClick={this.props.onAccept}>Accept</button>
+        </div>
+      </div>
+    );
+  }
+});
 
 var DialerApp = React.createClass({
   getInitialState() {
@@ -235,11 +256,12 @@ var DialerApp = React.createClass({
         { name: 'Spain', cc: '34', code: 'es' },
         { name: 'Brazil', cc: '55', code: 'br' },
         { name: 'Russia', cc: '7', code: 'ru' },
-        { name: 'China', cc: '86', code: 'cn' },
       ],
       selectedPhone: phones[0],
       status: 'Online',
       message: '',
+      calling: false,
+      connection: null,
     }
   },
 
@@ -268,9 +290,14 @@ var DialerApp = React.createClass({
     });
     
     Twilio.Device.incoming(function(conn) {
+      console.log(conn);
       console.log('Incoming connection from ' + conn.parameters.From);
-      // accept the incoming connection and start two-way audio
-      // conn.accept();
+      console.log(self.state.status);
+      if (self.state.status == 'Busy') {
+        conn.status('closed');
+        console.log('busy');
+      }
+      self.setState({ calling: true, togglePad: true, connection: conn })
     });
   },
 
@@ -333,6 +360,7 @@ var DialerApp = React.createClass({
     else {
       this.setState({status: "Online"})
     }
+    console.log(this.state.status);
   },
   updateMessage(e) {
     this.setState({
@@ -361,9 +389,15 @@ var DialerApp = React.createClass({
       console.log(error);
     })
   },
+  onAccept() {
+    this.state.connection.accept();
+  },
+  onDecline() {
+    this.state.connection.reject();
+    this.setState({calling: false});
+  },
   render: function() {
     var self = this;
-    
     return (
       <div id="dialer">
         {/* phone icon button */}
@@ -377,8 +411,8 @@ var DialerApp = React.createClass({
           </button>
         </div>        
 
-        { this.state.togglePad ? 
-          <div className="mainpad">
+        { this.state.togglePad 
+          ? <div className="mainpad">
             <StatusToggle status={this.state.status} toggleStatus={this.toggleStatus} />
             <SelectPhoneList handleToggleKeypad={ this.handleToggleKeypad }/>
             <div id="dial-form" className="input-group input-group-sm">
@@ -387,19 +421,22 @@ var DialerApp = React.createClass({
               <NumberInputText currentNumber={this.state.currentNumber} handleOnChange={this.handleChangeNumber} />
             </div>
             {
-              this.state.toggleKeypad ?
-                <div className="subPad">
-                  <DTMFTone handleOnClick={this.updatePhoneNumber}/>
-                  <div className="controls">
-                    <CallButton handleOnClick={this.handleToggleCall} disabled={!this.state.isValidNumber} onPhone={this.state.onPhone}/>
-                    { this.state.onPhone ? <MuteButton handleOnClick={this.handleToggleMute} muted={this.state.muted} /> : null }
-                  </div>
-                </div>: 
-                <MessageBox disabled={!this.state.isValidNumber}
-                            updateMessage={this.updateMessage}
-                            sendMessage={this.sendMessage}/>
-            }           
-          </div> : null 
+              this.state.calling 
+                ? <IncomingInfo phone_number={this.state.connection.parameters.From} location="USA" onAccept={this.onAccept} onDecline={this.onDecline}/> 
+                : this.state.toggleKeypad ?
+                  <div className="subPad">
+                    <DTMFTone handleOnClick={this.updatePhoneNumber}/>
+                    <div className="controls">
+                      <CallButton handleOnClick={this.handleToggleCall} disabled={!this.state.isValidNumber} onPhone={this.state.onPhone}/>
+                      { this.state.onPhone ? <MuteButton handleOnClick={this.handleToggleMute} muted={this.state.muted} /> : null }
+                    </div>
+                  </div>: 
+                  <MessageBox disabled={!this.state.isValidNumber}
+                              updateMessage={this.updateMessage}
+                              sendMessage={this.sendMessage}/>
+            }                       
+          </div> 
+          : null 
         }
         
 

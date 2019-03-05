@@ -176,3 +176,37 @@ textarea {
   width: 100%;
   margin-top: 8px;
 }
+
+/** Incoming **/
+.incoming
+{
+	font-size: 12px;
+    font-style: inherit;
+}
+
+.seconds {
+	font-size: 18px;
+    font-weight: bold;
+    color: green;
+}
+.caller {
+	    font-size: 14px;
+    color: black;
+    font-style: inherit;
+}
+
+.location {
+	font-size: 11px;
+    font-style: inherit;
+}
+
+.btn-decline {
+	margin: 4px;
+	background: black;
+    color: white;
+}
+.btn-accept {
+	background: yellowgreen;
+    color: white;
+    margin: 4px;
+}

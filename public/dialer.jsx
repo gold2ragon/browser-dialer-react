@@ -362,7 +362,6 @@ var DialerApp = React.createClass({
     fetch('/sms',{
       method: 'POST',
       body: JSON.stringify({
-        from: from,
         to: to,
         body: msg
       }),
@@ -374,6 +373,7 @@ var DialerApp = React.createClass({
     .then(function(response){
       return response.json()
     }).then(function(response){
+      alert('Sent Message!');
       console.log(response);
     }).catch(function(error) {
       console.log(error);

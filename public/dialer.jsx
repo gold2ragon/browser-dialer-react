@@ -1,6 +1,6 @@
 const phones = [
-  '14154840653',
-  '17178627937', 
+  'YOUR_TWILIO_NUMBER_1',
+  'YOUR_TWILIO_NUMBER_2', 
    
 ]
 const countries = [
@@ -15,8 +15,6 @@ const countries = [
   { name: 'Singapore', cc: '65', code: 'sg' },
   { name: 'Spain', cc: '34', code: 'es' },
   { name: 'Brazil', cc: '55', code: 'br' },
-  { name: 'Russia', cc: '7', code: 'ru' },
-  { name: 'China', cc: '86', code: 'cn' },
 ];
 var StatusToggle = React.createClass({
   render: function() {
@@ -285,9 +283,6 @@ var DialerApp = React.createClass({
     });
     
     Twilio.Device.incoming(function(conn) {
-      console.log(conn);
-      console.log('Incoming connection from ' + conn.parameters.From);
-      console.log(self.state.status);
       if (self.state.status == 'Online') {
         self.setState({ calling: true, togglePad: true, connection: conn })
       }
@@ -385,10 +380,9 @@ var DialerApp = React.createClass({
   onAccept() {
     this.state.connection.accept();
     let phone_number = this.state.connection.From;
-    console.log(phone_number);
     phone_number = phone_number.substring(1, phone_number.length-1)
     countries.map((country) => {
-      if (phone_number.indexOf(country.cc == 0)) {
+      if (phone_number.indexOf(country.cc) == 0) {
         phone_number = phone_number.substring(country.cc.length, phone_number.length - country.cc.length);
         self.setState({countryCode: countryCode});
         return true;

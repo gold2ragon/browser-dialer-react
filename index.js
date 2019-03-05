@@ -30,12 +30,7 @@ app.get('/token', (request, response) => {
   capability.addScope(
     new ClientCapability.IncomingClientScope('joey')
   );
-  // capability.allowClientOutgoing({applicationSid: process.env.TWILIO_TWIML_APP_SID});
-  // capability.allowClientIncoming('joey');
-
   const token = capability.toJwt();
-
-  // Include token in a JSON response
   response.send({
     token: token,
   });
@@ -49,9 +44,6 @@ app.post('/voice', (request, response) => {
   }, request.body.number);
   response.type('text/xml');
   response.send(voiceResponse.toString());
-  // voiceResponse.say('Hello from your pals at Twilio. Have fun!');
-  // response.type('text/xml');
-  // response.send(voiceResponse.toString());
 });
 
 app.post('/sms', (req, res) => {
